@@ -1,0 +1,133 @@
+---
+title: "R per proletari - Episodio 2"
+---
+
+```{r}
+#| label: librerie
+
+# carico le librerie necessarie per il progetto
+library(data.table)
+library(httr2)
+library(ggplot2)
+library(ggmap)
+
+# carico script
+source("R/data_download.R")
+```
+
+```{r}
+#| label: variabili
+
+# definisco alcune variabili globali utilizzate dal progetto
+prov_sigla <- "RE"                                    # sigla di Reggio Emilia
+data_selezionata <- "06/09/2025"                      # data scelta
+dataset_id <- "4dc855a1-6298-4b71-a1ae-d80693d43dcb"  # ID della risorsa CKAN
+limit <- 1000                                         # records per chiamata all'API
+log_file <- "data/log_download.csv"                   # file di log
+```
+
+
+## Introduzione
+
+Compagni, con questo report scritto con `R` e `Quarto` scaricheremo ed elaboreremo i dati di qualità dell'aria forniti dai fratelli socialisti dell'Emilia-Romagna.
+
+Nel documento `report.qmd` compariranno sia spezzoni di testo, come questo, sia spezzoni di codice R fuori corpo, racchiuso tra ``` ```, sia brevi spezzoni di codice in linea, racchiusi tra ` `.
+Una volta compilato il documento, comparirà un report pdf completo, dove testo e risultati calcolati sono alternati, secondo quanto da noi richiesto: il giogo di Excel è ormai spezzato!
+
+## Materiali
+
+I dati necessari vengono scaricati dall'*application programming interface* (API) dell'ottimo database di [ARPA Emilia-Romagna](https://dati.arpae.it/api/3/action/datastore_search?resource_id=4dc855a1-6298-4b71-a1ae-d80693d43dcb&limit=5) con le funzioni scritte appositamente per questo progetto e contenute in `R\data_download.R`. Nel caso di sorgenti di dati meno sofisticate, è possibile semplicemente caricare tutti i dati necessari da un normalissimo file .csv.
+
+Una volta scaricati, i dati vengono ripuliti e integrati con le informazioni delle anagrafiche stazioni e anagrafiche parametri, ottenuti sempre da [ARPA Emilia-Romagna](https://dati.arpae.it/dataset/qualita-dell-aria-rete-di-monitoraggio).
+
+```{r}
+#| label: carico_dati
+
+# anagrafica parametri: basta anche solo scaricare il csv a mano e metterlo nella certella data!
+if (file.exists("data/anagrafica_parametri.csv") == FALSE){
+  
+download.file(url = "https://docs.google.com/spreadsheets/d/1K6vRcShjje2CDnvnk39o3jkU4ihgpA7rfsdAV1S-yXU/export?format=csv",
+              destfile = "data/anagrafica_parametri.csv")
+}
+
+# anagrafica stazioni: basta anche solo scaricare il csv a mano e metterlo nella certella data!
+if (file.exists("data/anagrafica_stazioni.csv") == FALSE){
+  
+download.file(url = "https://docs.google.com/spreadsheets/d/1-4wgZ8JeLeg0bODTSFUrshPY-_y9mERUu0FJtSFr78s/export?format=csv",
+              destfile = "data/anagrafica_stazioni.csv")
+}
+
+# carico le sigle e i nomi delle province
+anagrafica_province <- fread("data/anagrafica_province.csv")
+
+# carico i dati delle stazioni e pulisco i nomi delle variabili
+anagrafica_stazioni <- fread("data/anagrafica_stazioni.csv") |> pulisci_dati()
+
+# togliamo i punti dai codici stazione per farli parlare con i dati restituiti dall'API
+anagrafica_stazioni[, cod_staz := gsub("\\.", "", cod_staz) |> as.numeric()]
+# formatto correttamente l'unità di misura
+anagrafica_stazioni[, um := gsub("ug/m3", "µg/m³", um)]
+
+# carico i dati dei parametri e pulisco i nomi delle variabili
+anagrafica_parametri <- fread("data/anagrafica_parametri.csv") |> pulisci_dati()
+# formatto correttamente l'unità di misura
+anagrafica_parametri[, um := gsub("ug/m3", "µg/m³", um)]
+
+# isolo i codici stazione della provincia di interesse
+stazioni_selezionate <- anagrafica_stazioni[provincia == prov_sigla,
+                                            unique(cod_staz)]
+
+# scarico i dati dall'API in spezzoni, nel caso siano troppo numerosi
+offset <- 0
+tutti_dati <- data.table()
+# tengo un log dei dowlonad
+log_dt <- data.table(offset = integer(), n_records = integer(),
+                     min_date = as.POSIXct(character()), max_date = as.POSIXct(character()))
+
+repeat {
+  cat("Scaricando records con offset:", offset, "\n")
+  chunk <- scarica_dati_sql(dataset_id = dataset_id,
+                            stazioni_selezionate = stazioni_selezionate,
+                            data_selezionata = data_selezionata,
+                            limit = limit,
+                            offset = offset)
+  n_chunk <- nrow(chunk)
+  
+  if (n_chunk == 0) break
+  
+  dati_api <- rbind(tutti_dati, chunk)
+  
+  # Log
+  min_date <- if ("reftime" %in% names(chunk)) min(chunk$reftime, na.rm = TRUE) else NA
+  max_date <- if ("reftime" %in% names(chunk)) max(chunk$reftime, na.rm = TRUE) else NA
+  log_dt <- rbind(log_dt, data.table(offset = offset, n_records = n_chunk, 
+                                     min_date = min_date, max_date = max_date))
+  
+  offset <- offset + limit
+}
+
+# salvo il log
+if(dir.exists("data") == FALSE)  {
+  dir.create("data", showWarnings = FALSE)
+}
+
+fwrite(log_dt, log_file)
+
+# unisco i dati con un inner join per creare il dataset con cui lavoreremo
+dati <- merge(dati_api,
+              anagrafica_stazioni,
+              by.x = c("station_id", "variable_id"),
+              by.y = c("cod_staz", "id_param"))
+# perdiamo per strada alcuni dati relativi a:
+# ozono (O3) misurato presso la centralina S. Lazzaro
+# o-xilene (C6H4(CH3)2) presso la centrlina Timavo,
+# però non è colpa nostra: i compagni probabilmente non hanno aggiornati i file
+# csv di appoggio.
+
+```
+
+
+
+Con altre funzioni, contenute sempre nella cartella `R` si procede alla creazione di grafici e tabelle.
+
+Tutti i risultati sono integrati in questo documento.
