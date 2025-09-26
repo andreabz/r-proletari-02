@@ -1,0 +1,112 @@
+% soviet-template.tex
+\documentclass[12pt,a4paper]{article}
+
+% --- Pacchetti base per layout, grafica, font e stile ---
+\usepackage[a4paper,top=2.5cm,bottom=3.2cm,left=2.5cm,right=2.5cm]{geometry}  % Margini pagina
+\usepackage{graphicx}                        % Inserimento immagini
+\usepackage{fancyhdr}                        % Header e footer personalizzati
+\usepackage{fontspec}                        % Gestione font con XeLaTeX
+\usepackage[most]{tcolorbox}                 % Box colorati per codice e evidenziazioni
+\usepackage{xcolor}                          % Gestione colori
+\usepackage{titlesec}                        % Formattazione titoli sezioni
+\usepackage{hyperref}                        % Link cliccabili nel PDF
+\usepackage{booktabs}                        % Migliori tabelle
+\usepackage{longtable}                       % Tabelle multi-pagina
+
+% === Gestione header e footer ===
+\setlength{\headheight}{50pt}    % spazio per l'header
+\setlength{\footskip}{40pt}      % distanza del footer dal fondo
+\addtolength{\topmargin}{-10pt}  % corregge il posizionamento in alto
+
+% --- Supporto per output Pandoc (quarto) ---
+\providecommand{\pandocbounded}[2]{#2}      % Evita errori su comandi Pandoc non definiti
+
+% === Font ===
+\setmainfont{TeX Gyre Termes}                    % Font principale
+\setsansfont{TeX Gyre Heros}                     % Font sans-serif
+\setmonofont{TeX Gyre Cursor}                    % Font monospace
+\newfontfamily\propagandafont[
+    Path=templates/,
+    UprightFont = *-Regular
+]{Anton}                                         % Font "Soviet" per titoli
+
+
+% === Box per evidenziazioni e codice ===
+\newtcolorbox{Shaded}{                       % Box per blocchi Shaded (es. codice)
+  colback=red!5!white,
+  colframe=red!75!black,
+  boxrule=0.5pt,
+  arc=2pt,
+  outer arc=1pt,
+  left=6pt, right=6pt, top=6pt, bottom=6pt,
+}
+
+\newtcolorbox{Highlighting}{                 % Box per evidenziazioni di codice con possibilità di interruzioni pagina
+  colback=red!10!white,
+  colframe=red!80!black,
+  boxrule=0.5pt,
+  arc=2pt,
+  outer arc=1pt,
+  left=6pt, right=6pt, top=6pt, bottom=6pt,
+  breakable,
+}
+
+\renewcommand{\pandocbounded}[2]{#1}
+
+% === Colori personalizzati sovietici ===
+\definecolor{SovietRed}{RGB}{186,18,18}     % Rosso tipico sovietico
+
+% === Header & Footer personalizzati con fancyhdr ===
+\pagestyle{fancy}                           
+\fancyhf{}                                  % Pulisce header e footer predefiniti
+
+% Header sinistro: logo + testo propaganda sovietica
+\fancyhead[L]{%
+  \raisebox{-0.3cm}{\includegraphics[height=2cm]{www/rproletari.png}}% Logo leggermente abbassato
+  \hspace{0.8cm}% Spazio orizzontale tra logo e testo
+  \raisebox{0.2cm}{% Alza il testo di 0.2 cm per allinearlo verticalmente col logo
+    \parbox[b]{0.7\textwidth}{%
+      \sffamily\itshape\footnotesize
+      Proletari della tastiera, liberatevi dal giogo del copia-incolla\\
+      respingete i fogli di calcolo borghesi!
+    }%
+  }
+}
+
+% Footer centrato con informazioni autore e link
+\fancyfoot[C]{%
+\small
+  \texttt{Andrea Bazzano} \textbar{}%
+  \texttt{CC-SA} \textbar{}%
+  \href{https://www.linkedin.com/in/andreabazzano}{linkedin.com/in/andreabazzano} \textbar{}%
+  \href{https://github.com/andreabz}{github.com/andreabz}
+}
+
+% Rimuove la linea sotto l'header, mantiene linea sottile nel footer
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% === Formattazione titoli di sezione ===
+\titleformat{\section}
+  {\propagandafont\color{SovietRed}\Large\uppercase} % Font Impact rosso sovietico, maiuscolo e grande
+  {\thesection}{1em}{}                                   % Non mostra il numero (vedi sotto)
+
+% === Disabilita numerazione sezioni ===
+\setcounter{secnumdepth}{0}                            % Nessun numero per sezioni o sottosezioni
+
+% === Inizio documento ===
+% Quarto inserisce titolo, autore, data da YAML qui
+\begin{document}
+$if(title)$
+\begin{center}
+  \vspace*{2cm}
+  {\propagandafont\fontsize{30}{36}\selectfont\textcolor{SovietRed}{\uppercase{$title$}} \par} % Titolo principale in Impact rosso
+  \vspace{0.5cm}
+  {\large\itshape $subtitle$ \par}                            % Sottotitolo in corsivo
+  \vspace{2cm}
+\end{center}
+$endif$
+
+$body$  % Corpo principale del documento (testi, sezioni, ecc.)
+
+\end{document}

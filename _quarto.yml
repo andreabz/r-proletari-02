@@ -1,5 +1,4 @@
 project:
   title: "r-proletari-02"
-
-editor: visual
+  output-dir: output
 
