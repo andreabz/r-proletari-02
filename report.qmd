@@ -38,9 +38,11 @@ library(httr2)
 library(ggplot2)
 
 # carico script
+source("R/utils.R")
 source("R/data_download.R")
 source("R/data_anagrafiche.R")
-source("R/utils.R")
+source("R/analisi_numerica.R")
+source("R/analisi_grafica.R")
 ```
 
 ```{r}
