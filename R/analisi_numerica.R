@@ -1,10 +1,15 @@
+# R/analisi_numerica.R
+# Funzioni per il valutare il rispetto dei limiti imposti dal D.Lgs. 155/2010.
+library(data.table)
+
 #' Controlla i valori giornalieri di PM10 rispetto al limite
 #'
 #' @param dati data.table con colonne: station_id, stazione, comune, reftime, parametro, value
 #' @details Restituisce per ciascuna stazione e giorno il valore di PM10 e un indicatore logico se supera il limite di 50 µg/m³
 check_pm10 <- function(dati) {
   dati[parametro == "PM10",
-       .(station_id, stazione, comune, reftime,
+       .(station_id, stazione, comune,
+         date = reftime,
          val_pm10 = value,
          supera_50 = value > 50)]
 }
@@ -13,13 +18,13 @@ check_pm10 <- function(dati) {
 #'
 #' @param dati data.table con colonne: station_id, stazione, comune, reftime, parametro, value
 #' @details Restituisce per ciascuna stazione e giorno i valori di PM2.5, PM10 e il loro rapporto
-calc_ratio_pm <- function(dati) {
+calc_pm25 <- function(dati) {
   pm10 <- dati[parametro == "PM10",
-               .(station_id, stazione, comune, reftime, val_pm10 = value)]
+               .(station_id, stazione, comune, date = reftime, val_pm10 = value)]
   pm25 <- dati[parametro == "PM2.5",
-               .(station_id, stazione, comune, reftime, val_pm25 = value)]
+               .(station_id, stazione, comune, date = reftime, val_pm25 = value)]
   merged <- merge(pm25, pm10,
-                  by = c("station_id", "stazione", "comune", "reftime"),
+                  by = c("station_id", "stazione", "comune", "date"),
                   all = FALSE)
   merged[, ratio_pm25_pm10 := val_pm25 / val_pm10]
   merged
@@ -87,6 +92,8 @@ check_o3 <- function(dati) {
   x[, rollmean_8h := frollmean(value, n = 8, align = "right"), by = station_id]
   x[
     , .(
+      min_oraria = min(value, na.rm = TRUE),
+      max_oraria = max(value, na.rm = TRUE),
       min_8h = min(rollmean_8h, na.rm = TRUE),
       max_8h = max(rollmean_8h, na.rm = TRUE),
       n_supera_120 = sum(rollmean_8h > 120, na.rm = TRUE),
@@ -94,9 +101,7 @@ check_o3 <- function(dati) {
       n_supera_240_3h = {
         r <- rle(value > 240)
         sum(r$lengths[r$values] >= 3)
-      },
-      min_oraria = min(value, na.rm = TRUE),
-      max_oraria = max(value, na.rm = TRUE)
+      }
     ), by = .(station_id, stazione, comune, date = as.Date(reftime))]
 }
 
@@ -111,7 +116,7 @@ report_parametro <- function(dati, parametro) {
   if (parametro == "PM10") {
     check_pm10(dati)
   } else if (parametro == "PM2.5") {
-    calc_ratio_pm(dati)
+    calc_pm25(dati)
   } else if (parametro == "NO2") {
     check_no2(dati)
   } else if (parametro == "SO2") {
