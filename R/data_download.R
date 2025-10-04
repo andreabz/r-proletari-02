@@ -1,6 +1,7 @@
 # R/download_dati.R
 # Scarica dati ARPAE Emilia-Romagna via SQL API, prepara per elaborazione e log
-# Dipendenze minime: httr2, data.table
+library(data.table)
+library(httr2)
 
 #' Sanitize SQL input
 #'
