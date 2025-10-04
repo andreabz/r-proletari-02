@@ -1,3 +1,7 @@
+# R/utils.R
+# Funzioni generali utilizzate in varie parti del progetto
+library(data.table)
+
 #' Pulizia e normalizzazione dati ARPAE
 #'
 #' Pulisce e converte i dati scaricati dall'API ARPAE:
