@@ -26,7 +26,7 @@ jobs:
         quarto render report.qmd --to pdf --output docs/report.pdf
 
     - name: Upload artifacts (optional)
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: report-files
         path: docs/
