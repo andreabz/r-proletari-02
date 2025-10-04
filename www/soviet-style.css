@@ -121,3 +121,27 @@ h1, h2, h3, h4, h5 {
 .copyright a:hover {
   text-decoration: underline;
 }
+
+/* Contenitore per lo scroll orizzontale delle tabelle */
+body > table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch; /* scroll fluido su mobile */
+}
+
+/* Stile per tutte le tabelle */
+table {
+  min-width: 500px; /* larghezza minima per evitare spezzamenti indesiderati */
+  width: auto;
+  table-layout: auto; /* larghezza adattiva */
+  border-collapse: collapse;
+}
+
+/* Celle intestazioni e dati */
+th, td {
+  min-width: 90px; /* larghezza minima delle celle per una buona leggibilità */
+  white-space: normal; /* permette il wrapping del testo */
+  word-wrap: break-word; /* spezza parole troppo lunghe */
+  padding: 6px 12px;
+}

@@ -17,6 +17,7 @@ format:
     embed-resources: true
     toc: false
     number-sections: false
+    lightbox: true
 lang: it
 highlight: null
 fontsize: 12pt
@@ -43,6 +44,7 @@ source("R/data_download.R")
 source("R/data_anagrafiche.R")
 source("R/analisi_numerica.R")
 source("R/analisi_grafica.R")
+source("R/report_helper.R")
 ```
 
 ```{r}
@@ -62,7 +64,7 @@ log_file <- "data/log_download.csv"                   # file di log
 Compagno, con questo report scritto con `R` e `Quarto`, scaricheremo ed elaboreremo i dati di qualità dell'aria forniti dai fratelli socialisti dell'Emilia-Romagna.
 
 Nel documento `report.qmd` troverai sia passaggi di testo, sia blocchi di codice R racchiusi tra tripli backtick `` ``` ``` ``, sia frammenti di codice in linea delimitati da singoli backtick `` ` ` ``.  
-Al termine della compilazione, otterrai report HTML e PDF completi, in cui testo e risultati di calcolo si alternano armoniosamente: il giogo borghese di Excel è stato spezzato!
+Al termine della compilazione, otterrai report HTML e PDF completi, in cui testo e risultati di calcolo marceranno insieme: il giogo borghese di Excel è stato spezzato e la rivoluzione dei dati è iniziata!
 
 ## Materiali
 
@@ -77,7 +79,8 @@ Dopo il download, i dati vengono ripuliti e integrati con le informazioni delle 
 #| message: false
 
 # 1. Carico le anagrafiche e filtro per provincia
-anagrafiche <- carica_anagrafiche(prov_sigla = "RE")
+anagrafiche <- carica_anagrafiche(prov_sigla = prov_sigla)
+provincia <- carica_provincia(sigla = prov_sigla)
 
 # 2. Scarico i dati per quelle stazioni
 dati_api <- scarica_dati_sql(
@@ -101,9 +104,22 @@ dati <- merge(
 
 ```
 
-Con altre funzioni, contenute sempre nella cartella `R` si procede alla creazione di grafici e tabelle.
+Con le funzioni in `R/analisi_numerica.R` vengono svolte le analisi previste dal Decreto Legislativo 152/2010 prodotto dall'assemblea del popolo, sorvolando su qualche controllo borghese riguardante la numerosità dei valori: la rivoluzione non può aspettare!
 
-Tutti i risultati sono integrati in questo documento.
+In `R/analisi_grafica.R` i grafici si ergono come bandiere rosse al vento: approvati dal Komintern e benedetti dal compagno Lenin, pronti a diffondere tra le masse il glorioso progetto internazionale socialista.
+
+Infine, in `R/report_helper.R` orchestra tabelle, grafici e commenti militanti con funzioni automatiche come `crea_sezione_parametro()`. Le frasi? Direttamente dal libretto rosso del compagno Mao, per un report che marcia compatto verso l'illuminazione proletaria.
+
+```{r}
+#| label: results
+#| output: asis
+
+cat(paste("\n\n## Risultati del", data_selezionata,
+          "per la provincia di", provincia, "\n\n"))
+
+report <- report_giornaliero(dati)
+report_giornaliero_sezioni(report, dati)
+```
 
 ```{=html}
 <footer class="copyright">
