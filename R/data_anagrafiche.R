@@ -1,5 +1,7 @@
+# R/data_anagrafiche.R
 #' Carica e prepara le anagrafiche delle stazioni
-#'
+library(data.table)
+
 #' Questa funzione scarica (se necessario), carica e pulisce le tabelle
 #' di anagrafica delle stazioni di qualità dell'aria.
 #' Inoltre filtra l'elenco delle stazioni corrispondenti a una determinata
@@ -61,4 +63,13 @@ carica_anagrafiche <- function(prov_sigla = "RE") {
     stazioni_selezionate = stazioni_selezionate,
     anagrafica_stazioni = anagrafica_stazioni
   )
+}
+
+#' Questa funzione permette di ricavare il nome della provincia dalla sua sigla
+#' 
+#' @param sigla sigla della provincia (es. `"RE"` per Reggio Emilia)
+#' @return un vettore con un elemento testuale contenente il nome della provincia
+carica_provincia <- function(sigla) {
+  anagraficha_provincia <- fread("data/anagrafica_province.csv")
+  anagraficha_provincia[prov_sigla == sigla, prov_nome]
 }
