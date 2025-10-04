@@ -1,7 +1,15 @@
-.Rproj.user
+# R
 .Rhistory
 .RData
-.Ruserdata
+.Rproj.user/
 
 /.quarto/
+
+# renv
+renv/library/
+renv/staging/
+
+# Output generato
 output/
+*.html
+*.pdf

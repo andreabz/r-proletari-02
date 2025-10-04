@@ -27,7 +27,7 @@ execute:
   warning: false
   error: false
 project:
-  output-dir: output
+  output-dir: docs
 ---
 
 ```{r}

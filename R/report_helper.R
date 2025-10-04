@@ -221,12 +221,12 @@ crea_sezione_parametro <- function(parametro, report, dati, width = 7, height = 
   if (parametro %in% c("NO2", "SO2", "O3")) {
     plot <- grafico_parametro(dati, parametro)
     
-    outdir <- "output"
-    dir.create(file.path(outdir, "img"), showWarnings = FALSE, recursive = TRUE)
+    outdir <- "docs/img"
+    dir.create(outdir, showWarnings = FALSE, recursive = TRUE)
     is_latex <- knitr::is_latex_output()
     ext <- if (is_latex) ".pdf" else ".png"
     
-    tmpfile <- file.path(outdir, "img", paste0(data, "_", prov, "_", parametro, ext))
+    tmpfile <- file.path(outdir, paste0(data, "_", prov, "_", parametro, ext))
     
     # Salva grafico
     ggplot2::ggsave(
