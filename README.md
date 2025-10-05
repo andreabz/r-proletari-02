@@ -48,10 +48,10 @@ inquinanti atmosferici.
    source("init.R")
    ```
    
-3. Generare il report
+3. Generare il report per la data (formato dd/mm/YYYY) e provincia (sigla) desiderata:
 
    ```bash
-   quarto render report.qmd
+   quarto render report.qmd -P data:"06/09/2025" -P provincia:"RE"
    ```
    
 ## Criteri di valutazione dei dati secondo il Decreto Legislativo 155/2010
