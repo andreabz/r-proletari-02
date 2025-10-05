@@ -242,7 +242,7 @@ crea_sezione_parametro <- function(parametro, report, dati, width = 7, height = 
     if (is_latex) {
       cat("\\begin{center}\\includegraphics[width=0.8\\textwidth]{", tmpfile, "}\\end{center}\n\n")
     } else {
-      relpath <- file.path("img", basename(tmpfile))
+      relpath <- file.path("docs", "img", basename(tmpfile))
       cat("![](", relpath, ")\n\n", sep = "")
     }
   }
