@@ -38,8 +38,8 @@ inquinanti atmosferici.
 1. Clonare il repository:
 
    ```bash
-   git clone https://github.com/<tuo-username>/<repo>.git
-   cd <repo>
+   git clone https://github.com/andreabz/r-proletari-02.git
+   cd r-proletari-02
    ```
 
 2. Inizializzare l’ambiente R
