@@ -31,6 +31,10 @@ jobs:
         run: |
           Rscript -e 'install.packages("tinytex")'
           Rscript -e 'tinytex::install_tinytex()'
+          
+      - name: Install Tex Gyre Fonts
+        run: |
+          Rscript -e 'tinytex::tlmgr_install(c("tex-gyre"))'
 
       - name: Install R Dependencies
         uses: r-lib/actions/setup-renv@v2
