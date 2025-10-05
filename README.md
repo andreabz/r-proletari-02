@@ -1,30 +1,31 @@
 # R per proletari - Episodio 02
 
-**R per proletari** è una serie di post LinkedIn con lo scopo di fornire un aiuto
-per automatizzare la produzione di report ripetitivi.
+**R per proletari** è una serie di post su LinkedIn dedicata a chi vuole
+liberarsi dal giogo del lavoro manuale e automatizzare la produzione di report
+ripetitivi con la potenza collettiva di **R** e **Quarto**.
 
-In questo episodio 02, il primo dopo il manifesto iniziale del progetto,
-iniziamo con la creazione di una sorta di bollettino della qualità dell'aria
-utilizzando i dati di ARPA Emilia-Romagna relativi alle misure di contaminanti
-atmosferici nelle centraline della provincia di Reggio Emilia.
+In questo *episodio 02*, il primo dopo il manifesto iniziale del progetto,
+costruiamo un bollettino sulla qualità dell’aria della provincia di **Reggio Emilia**
+utilizzando i dati dei compagni di **ARPA Emilia-Romagna** relativi ai principali
+inquinanti atmosferici.
 
 ## Obiettivi
 
-- Scaricare i dati dalle API di 
-[**ARPA Emilia-Romagna**](https://dati.arpae.it/datastore/dump/4dc855a1-6298-4b71-a1ae-d80693d43dcb).
-- Elaborare e valutare i dati secondo i criteri del 
-[**Decreto Legislativo 155/2010**](https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2010-08-13;155).
-- Generare un report in formato Quarto analogo a un bollettino della qualità 
-dell'aria per la provincia di **Reggio Emilia**.
+- Scaricare i dati dalle [API di ARPA Emilia-Romagna](https://dati.arpae.it/datastore/dump/4dc855a1-6298-4b71-a1ae-d80693d43dcb).  
+- Analizzare i dati secondo i criteri del  
+  [Decreto Legislativo 155/2010](https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2010-08-13;155).  
+- Generare automaticamente un report Quarto (HTML e PDF) analogo a un bollettino
+  ufficiale e pubblicarlo su GitHub Pages:  
+  👉 [andreabz.github.io/r-proletari-02](https://andreabz.github.io/r-proletari-02/).
 
 ## Struttura del progetto
 
-- `R/` – funzioni per scaricare ed elaborare i dati.
-- `data/` – dati scaricati dalle API.
-- `report.qmd` – documento Quarto per la generazione del bollettino.
-- `output/` – report generati.
-- `init.R` – script per inizializzare l'ambiente con renv.
-- `renv/` + `renv.lock` – gestione dell'ambiente con **renv**.
+- `R/` – funzioni per scaricare, pulire e analizzare i dati.  
+- `data/` – archivio dei dati grezzi scaricati dalle API.  
+- `report.qmd` – documento Quarto principale del bollettino.  
+- `output/` – cartella con i report generati (esclusa dal controllo Git).  
+- `init.R` – script per inizializzare l’ambiente tramite **renv**.  
+- `renv/` + `renv.lock` – ambiente R riproducibile e condivisibile.
 
 ## Requisiti
 
@@ -41,7 +42,7 @@ dell'aria per la provincia di **Reggio Emilia**.
    cd <repo>
    ```
 
-2. In R, lanciare lo script di inizializzazione:
+2. Inizializzare l’ambiente R
 
    ```r
    source("init.R")
@@ -68,11 +69,12 @@ Il report confronta i dati osservati con i valori limite di legge, ad esempio:
 
 Il report finale include:
 
-- Una mappa dei punti di monitoraggio (con `ggplot2` + `ggmap`).
-- Tabelle di confronto tra valori osservati e limiti normativi.
-- Grafici temporali delle concentrazioni.
+- Documenti [html](https://andreabz.github.io/r-proletari-02/) e pdf.
+- Tabelle comparative tra osservazioni e limiti normativi.
+- Grafici temporali per ogni inquinante e stazione.
 
 ## Prossimi sviluppi
 
 - Estensione ad altre province dell'Emilia-Romagna.
-- Automazione programmata (GitHub Actions o `cron`).
+- Automazione completa della pubblicazione con GitHub Actions.
+- Diffusione tra le masse di un'analisi dati degna della pianificazione quinquennale.
